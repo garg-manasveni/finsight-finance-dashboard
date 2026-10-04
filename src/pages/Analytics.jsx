@@ -9,7 +9,6 @@ import {
     PieChart,
     Pie,
     Cell,
-    Legend,
 } from "recharts";
 
 import {
@@ -18,20 +17,26 @@ import {
     formatCurrency,
 } from "../utils/financeUtils";
 
+const CATEGORY_COLORS = [
+    "#8b5cf6",
+    "#22c55e",
+    "#f97316",
+    "#06b6d4",
+    "#ef476f",
+    "#eab308",
+    "#3b82f6",
+    "#d946ef",
+    "#14b8a6",
+    "#f472b6",
+];
+
 function Analytics({ transactions }) {
     const categoryData = getCategoryTotals(transactions);
     const monthlyData = getMonthlyTotals(transactions);
-
-    const COLORS = [
-        "#8b5cf6",
-        "#a78bfa",
-        "#c4b5fd",
-        "#d8b4fe",
-        "#f0abfc",
-        "#f9a8d4",
-        "#93c5fd",
-        "#86efac",
-    ];
+    const totalCategoryExpenses = categoryData.reduce(
+        (total, category) => total + category.value,
+        0
+    );
 
     return (
         <div className="page">
@@ -144,7 +149,8 @@ function Analytics({ transactions }) {
                             </p>
                         </div>
                     ) : (
-                        <div className="pie-container">
+                        <div className="category-chart-content">
+                            <div className="pie-container">
 
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -163,10 +169,12 @@ function Analytics({ transactions }) {
                                             <Cell
                                                 key={`cell-${index}`}
                                                 fill={
-                                                    COLORS[
-                                                        index % COLORS.length
+                                                    CATEGORY_COLORS[
+                                                        index % CATEGORY_COLORS.length
                                                     ]
                                                 }
+                                                stroke="var(--surface)"
+                                                strokeWidth={2}
                                             />
                                         ))}
                                     </Pie>
@@ -177,10 +185,53 @@ function Analytics({ transactions }) {
                                         }
                                     />
 
-                                    <Legend />
-
                                 </PieChart>
                             </ResponsiveContainer>
+
+                            <div className="pie-center-label">
+                                <span>Total expenses</span>
+                                <strong>
+                                    {formatCurrency(totalCategoryExpenses)}
+                                </strong>
+                            </div>
+                            </div>
+                            <div className="category-legend">
+                                {categoryData.map((category, index) => {
+                                    const percentage =
+                                        totalCategoryExpenses > 0
+                                            ? Math.round(
+                                                (category.value /
+                                                    totalCategoryExpenses) *
+                                                    100
+                                            )
+                                            : 0;
+
+                                    return (
+                                        <div
+                                            className="category-legend-item"
+                                            key={category.name}
+                                        >
+                                            <span
+                                                className="category-legend-swatch"
+                                                style={{
+                                                    backgroundColor:
+                                                        CATEGORY_COLORS[
+                                                            index %
+                                                                CATEGORY_COLORS.length
+                                                        ],
+                                                }}
+                                                aria-hidden="true"
+                                            />
+                                            <span className="category-legend-name">
+                                                {category.name}
+                                            </span>
+                                            <span className="category-legend-percent">
+                                                {percentage}%
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
                         </div>
                     )}

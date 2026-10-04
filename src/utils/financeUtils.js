@@ -75,27 +75,23 @@ export function getCategoryTotals(transactions) {
 // Used by Budgets.jsx
 // =========================================
 
-export function calculateCategoryExpenses(transactions) {
-    const categoryExpenses = {};
+// =========================================
+// CATEGORY EXPENSES
+// Used by Budgets.jsx
+// =========================================
 
-    transactions
+export function calculateCategoryExpenses(transactions, category) {
+    return transactions
         .filter(
             (transaction) =>
-                transaction.type === "expense"
+                transaction.type === "expense" &&
+                transaction.category === category
         )
-        .forEach((transaction) => {
-            const category = transaction.category;
-
-            if (!categoryExpenses[category]) {
-                categoryExpenses[category] = 0;
-            }
-
-            categoryExpenses[category] += Number(
-                transaction.amount
-            );
-        });
-
-    return categoryExpenses;
+        .reduce(
+            (sum, transaction) =>
+                sum + Number(transaction.amount),
+            0
+        );
 }
 
 

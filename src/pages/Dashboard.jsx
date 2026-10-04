@@ -14,19 +14,34 @@ import {
 } from "../utils/financeUtils";
 
 function Dashboard({
-    transactions,
-    budgets,
-    goals,
+    transactions = [],
+    budgets = [],
+    goals = [],
 }) {
-    const totals = calculateTotals(transactions);
+    // Make sure the values are always arrays
+    const safeTransactions = Array.isArray(transactions)
+        ? transactions
+        : [];
 
-    const currentMonth = getCurrentMonthTotals(transactions);
+    const safeGoals = Array.isArray(goals)
+        ? goals
+        : [];
+
+    const safeBudgets = Array.isArray(budgets)
+        ? budgets
+        : [];
+
+    const totals = calculateTotals(safeTransactions);
+
+    const currentMonth =
+        getCurrentMonthTotals(safeTransactions);
+
     const income = totals.income;
     const expenses = totals.expenses;
     const balance = totals.balance;
 
     const recentTransactions =
-        [...transactions]
+        [...safeTransactions]
             .sort(
                 (a, b) =>
                     new Date(b.date) -
@@ -37,6 +52,7 @@ function Dashboard({
     return (
         <div className="page">
 
+            {/* PAGE HEADER */}
             <div className="page-header">
 
                 <div>
@@ -67,6 +83,8 @@ function Dashboard({
 
             </div>
 
+
+            {/* STAT CARDS */}
             <section className="stats-grid">
 
                 <StatCard
@@ -96,7 +114,8 @@ function Dashboard({
                 <StatCard
                     title="This Month"
                     value={formatCurrency(
-                        currentMonth.income - currentMonth.expenses
+                        currentMonth.income -
+                        currentMonth.expenses
                     )}
                     description="This month's net savings"
                     icon={<PiggyBank />}
@@ -105,8 +124,12 @@ function Dashboard({
 
             </section>
 
+
+            {/* DASHBOARD CONTENT */}
             <section className="dashboard-grid">
 
+
+                {/* RECENT TRANSACTIONS */}
                 <div className="dashboard-card">
 
                     <div className="card-header">
@@ -123,15 +146,22 @@ function Dashboard({
 
                     </div>
 
+
                     <div className="transaction-list">
 
                         {recentTransactions.length === 0 ? (
+
                             <div className="empty-state">
-                                <p>No transactions yet.</p>
+                                <p>
+                                    No transactions yet.
+                                </p>
                             </div>
+
                         ) : (
+
                             recentTransactions.map(
                                 (transaction) => (
+
                                     <div
                                         className="transaction-row"
                                         key={transaction.id}
@@ -147,6 +177,7 @@ function Dashboard({
                                             </div>
 
                                             <div>
+
                                                 <strong>
                                                     {transaction.title}
                                                 </strong>
@@ -154,9 +185,11 @@ function Dashboard({
                                                 <span>
                                                     {transaction.category}
                                                 </span>
+
                                             </div>
 
                                         </div>
+
 
                                         <strong
                                             className={
@@ -176,19 +209,24 @@ function Dashboard({
                                         </strong>
 
                                     </div>
+
                                 )
                             )
+
                         )}
 
                     </div>
 
                 </div>
 
+
+                {/* SAVINGS GOALS */}
                 <div className="dashboard-card">
 
                     <div className="card-header">
 
                         <div>
+
                             <span className="card-label">
                                 SAVINGS
                             </span>
@@ -196,61 +234,99 @@ function Dashboard({
                             <h3>
                                 Your goals
                             </h3>
+
                         </div>
 
                     </div>
 
+
                     <div className="goal-mini-list">
 
-                        {goals.slice(0, 3).map((goal) => {
+                        {safeGoals.length === 0 ? (
 
-                            const percentage = Math.min(
-                                (goal.saved / goal.target) *
-                                100,
-                                100
-                            );
+                            <div className="empty-state">
 
-                            return (
-                                <div
-                                    className="goal-mini"
-                                    key={goal.id}
-                                >
+                                <p>
+                                    No savings goals yet.
+                                </p>
 
-                                    <div className="goal-mini-header">
-                                        <strong>
-                                            {goal.title}
-                                        </strong>
+                            </div>
 
-                                        <span>
-                                            {Math.round(
-                                                percentage
-                                            )}
-                                            %
-                                        </span>
-                                    </div>
+                        ) : (
 
-                                    <div className="progress-track">
+                            safeGoals
+                                .slice(0, 3)
+                                .map((goal) => {
+
+                                    const target =
+                                        Number(goal.target) || 0;
+
+                                    const saved =
+                                        Number(goal.saved) || 0;
+
+                                    const percentage =
+                                        target > 0
+                                            ? Math.min(
+                                                  (saved /
+                                                      target) *
+                                                      100,
+                                                  100
+                                              )
+                                            : 0;
+
+                                    return (
                                         <div
-                                            className="progress-fill"
-                                            style={{
-                                                width: `${percentage}%`,
-                                            }}
-                                        />
-                                    </div>
+                                            className="goal-mini"
+                                            key={goal.id}
+                                        >
 
-                                    <p>
-                                        {formatCurrency(
-                                            goal.saved
-                                        )}{" "}
-                                        of{" "}
-                                        {formatCurrency(
-                                            goal.target
-                                        )}
-                                    </p>
+                                            <div className="goal-mini-header">
 
-                                </div>
-                            );
-                        })}
+                                                <strong>
+                                                    {goal.title}
+                                                </strong>
+
+                                                <span>
+                                                    {Math.round(
+                                                        percentage
+                                                    )}
+                                                    %
+                                                </span>
+
+                                            </div>
+
+
+                                            <div className="progress-track">
+
+                                                <div
+                                                    className="progress-fill"
+                                                    style={{
+                                                        width: `${percentage}%`,
+                                                    }}
+                                                />
+
+                                            </div>
+
+
+                                            <p>
+
+                                                {formatCurrency(
+                                                    saved
+                                                )}
+
+                                                {" "}of{" "}
+
+                                                {formatCurrency(
+                                                    target
+                                                )}
+
+                                            </p>
+
+                                        </div>
+                                    );
+                                })
+
+                        )}
 
                     </div>
 

@@ -1,14 +1,9 @@
-import {
-    BrowserRouter,
-    Route,
-    Routes,
-    useInRouterContext,
-} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
 
 import Dashboard from "./pages/Dashboard";
-import Transactions from "./pages/transactions";
+import Transactions from "./pages/Transactions";
 import Analytics from "./pages/Analytics";
 import Budgets from "./pages/Budgets";
 import Goals from "./pages/Goals";
@@ -16,7 +11,7 @@ import Settings from "./pages/Settings";
 
 import { useLocalStorage } from "./hooks/useLocalStorage";
 
-function AppContent() {
+function App() {
     const [transactions, setTransactions] = useLocalStorage(
         "finsight-transactions",
         []
@@ -125,23 +120,22 @@ function AppContent() {
 
     return (
         <div className="app-shell">
-
             <Sidebar />
 
             <main className="main-content">
                 <Routes>
 
-                    {/* Dashboard */}
                     <Route
                         path="/"
                         element={
                             <Dashboard
                                 transactions={transactions}
+                                budgets={budgets}
+                                goals={goals}
                             />
                         }
                     />
 
-                    {/* Transactions */}
                     <Route
                         path="/transactions"
                         element={
@@ -154,7 +148,6 @@ function AppContent() {
                         }
                     />
 
-                    {/* Analytics */}
                     <Route
                         path="/analytics"
                         element={
@@ -164,7 +157,6 @@ function AppContent() {
                         }
                     />
 
-                    {/* Budgets */}
                     <Route
                         path="/budgets"
                         element={
@@ -179,7 +171,6 @@ function AppContent() {
                         }
                     />
 
-                    {/* Goals */}
                     <Route
                         path="/goals"
                         element={
@@ -193,7 +184,6 @@ function AppContent() {
                         }
                     />
 
-                    {/* Settings */}
                     <Route
                         path="/settings"
                         element={
@@ -207,20 +197,7 @@ function AppContent() {
 
                 </Routes>
             </main>
-
         </div>
-    );
-}
-
-function App() {
-    const isWithinRouter = useInRouterContext();
-
-    return isWithinRouter ? (
-        <AppContent />
-    ) : (
-        <BrowserRouter>
-            <AppContent />
-        </BrowserRouter>
     );
 }
 

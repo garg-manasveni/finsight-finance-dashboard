@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
+import {
+    TRANSACTION_CATEGORIES,
+    normalizeCategory,
+} from "../utils/financeUtils";
 
-const categories = [
-    "Food",
-    "Transport",
-    "Shopping",
-    "Bills",
-    "Entertainment",
-    "Education",
-    "Health",
-    "Salary",
-    "Freelance",
-    "Other",
-];
+const categories = TRANSACTION_CATEGORIES;
 
 function TransactionForm({
     onSubmit,
@@ -32,7 +25,9 @@ function TransactionForm({
                 title: editingTransaction.title,
                 amount: editingTransaction.amount,
                 type: editingTransaction.type,
-                category: editingTransaction.category,
+                category: normalizeCategory(
+                    editingTransaction.category
+                ),
                 date: editingTransaction.date,
             });
         }
@@ -62,6 +57,7 @@ function TransactionForm({
 
         onSubmit({
             ...formData,
+            category: normalizeCategory(formData.category),
             amount: Number(formData.amount),
         });
 

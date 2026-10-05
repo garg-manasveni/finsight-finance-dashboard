@@ -39,6 +39,43 @@ export function formatCurrency(amount) {
     }).format(Number(amount) || 0);
 }
 
+export const EXPENSE_CATEGORIES = [
+    "Food",
+    "Transport",
+    "Shopping",
+    "Bills",
+    "Entertainment",
+    "Education",
+    "Health",
+    "Other",
+];
+
+export const INCOME_CATEGORIES = [
+    "Salary",
+    "Freelance",
+];
+
+export const TRANSACTION_CATEGORIES = [
+    ...EXPENSE_CATEGORIES,
+    ...INCOME_CATEGORIES,
+];
+
+export const BUDGET_CATEGORIES = EXPENSE_CATEGORIES;
+
+export const CATEGORY_ALIASES = {
+    Travel: "Transport",
+};
+
+export function normalizeCategory(category) {
+    const safeCategory = String(category ?? "").trim();
+
+    if (!safeCategory) {
+        return "Other";
+    }
+
+    return CATEGORY_ALIASES[safeCategory] ?? safeCategory;
+}
+
 
 // =========================================
 // CATEGORY TOTALS
@@ -50,7 +87,9 @@ export function getCategoryTotals(transactions) {
     transactions
         .filter((transaction) => transaction.type === "expense")
         .forEach((transaction) => {
-            const category = transaction.category;
+            const category = normalizeCategory(
+                transaction.category
+            );
 
             if (!categoryTotals[category]) {
                 categoryTotals[category] = 0;
@@ -81,11 +120,14 @@ export function getCategoryTotals(transactions) {
 // =========================================
 
 export function calculateCategoryExpenses(transactions, category) {
+    const normalizedCategory = normalizeCategory(category);
+
     return transactions
         .filter(
             (transaction) =>
                 transaction.type === "expense" &&
-                transaction.category === category
+                normalizeCategory(transaction.category) ===
+                    normalizedCategory
         )
         .reduce(
             (sum, transaction) =>

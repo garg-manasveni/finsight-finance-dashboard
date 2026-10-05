@@ -64,7 +64,7 @@ export const initialBudgets = [
     },
     {
         id: 4,
-        category: "Travel",
+        category: "Transport",
         limit: 5000,
     },
 ];

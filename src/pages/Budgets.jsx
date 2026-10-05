@@ -1,7 +1,9 @@
 import { useState } from "react";
 import {
+    BUDGET_CATEGORIES,
     calculateCategoryExpenses,
     formatCurrency,
+    normalizeCategory,
 } from "../utils/financeUtils";
 
 function Budgets({
@@ -15,14 +17,7 @@ function Budgets({
     const [limit, setLimit] =
         useState("");
 
-    const categories = [
-        "Food",
-        "Education",
-        "Travel",
-        "Entertainment",
-        "Shopping",
-        "Bills",
-    ];
+    const categories = BUDGET_CATEGORIES;
 
     function addBudget(event) {
         event.preventDefault();
@@ -33,7 +28,7 @@ function Budgets({
             ...previous,
             {
                 id: Date.now(),
-                category,
+                category: normalizeCategory(category),
                 limit: Number(limit),
             },
         ]);

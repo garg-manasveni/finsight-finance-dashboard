@@ -217,8 +217,8 @@ function Transactions({
 
                                             <div className="transaction-icon">
                                                 {transaction.type === "income"
-                                                    ? "↗"
-                                                    : "↘"}
+                                                    ? "↘"
+                                                    : "↗"}
                                             </div>
 
                                             <div>

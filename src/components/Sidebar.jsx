@@ -67,6 +67,8 @@ function Sidebar() {
                             key={item.path}
                             to={item.path}
                             end={item.path === "/"}
+                            aria-label={item.name}
+                            title={item.name}
                             className={({ isActive }) =>
                                 isActive
                                     ? "nav-item active"
